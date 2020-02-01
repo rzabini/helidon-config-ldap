@@ -1,15 +1,7 @@
 package ldaptive;
 
 import helidon.config.ldap.LdapEndpoint;
-import org.ldaptive.BindOperation;
-import org.ldaptive.LdapEntry;
-import org.ldaptive.SearchOperation;
-import org.ldaptive.SearchRequest;
-import org.ldaptive.SearchResponse;
-import org.ldaptive.SearchScope;
-import org.ldaptive.SimpleBindRequest;
-import org.ldaptive.SingleConnectionFactory;
-import org.ldaptive.filter.PresenceFilter;
+import org.ldaptive.*;
 
 import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
@@ -54,23 +46,23 @@ public interface LdapTree {
         }
 
         public Map<String, String> toMap(final String baseDn, final String attrName) throws LdapException {
-            try (SingleConnectionFactory cf = new SingleConnectionFactory(ldapUrl)) {
-                cf.initialize();
-                new BindOperation(cf).execute(SimpleBindRequest.builder().dn(bindDn).password(password).build());
-
+            ConnectionConfig connConfig = new ConnectionConfig(ldapUrl);
+               connConfig.setConnectionInitializer(
+                        new BindConnectionInitializer(
+                                bindDn, new Credential(password)));
+                ConnectionFactory cf = new DefaultConnectionFactory(connConfig);
+            try {
                 return searchThenMap(baseDn, attrName, cf);
             } catch (org.ldaptive.LdapException e) {
                 throw new LdapException(e);
             }
         }
 
-        private Map<String, String> searchThenMap(String baseDn, String attrName, SingleConnectionFactory cf) throws org.ldaptive.LdapException {
-            final SearchResponse searchResponse = new SearchOperation(cf)
-                    .execute(SearchRequest.builder()
-                            .dn(baseDn).scope(SearchScope.SUBTREE)
-                            .filter(new PresenceFilter(attrName))
-                            .returnAttributes(attrName).build());
-            return mapResponse(searchResponse.getEntries(), attrName);
+        private Map<String, String> searchThenMap(String baseDn, String attrName, ConnectionFactory cf) throws org.ldaptive.LdapException {
+            SearchExecutor executor = new SearchExecutor();
+            executor.setBaseDn(baseDn);
+            SearchResult result = executor.search(cf, String.format("(%s=*)", attrName), attrName).getResult();
+            return mapResponse(result.getEntries(), attrName);
         }
 
         public Map<String, String> mapResponse(final Collection<LdapEntry> searchResponseEntries, final String attrName) {
@@ -80,5 +72,4 @@ public interface LdapTree {
                             ldapEntry -> value(ldapEntry, attrName)));
         }
     }
-
 }

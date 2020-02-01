@@ -10,13 +10,14 @@ import ldaptive.LdapTree
 import spock.lang.Specification
 
 class LdapConfigSourceSpecification extends Specification {
-    private static final Map<String, String> ldapParams = Map.of(
-            "uri", "ldap://ldap.forumsys.com"
-            ,"bindDn", "cn=read-only-admin,dc=example,dc=com"
-            ,"password", "password"
-            ,"baseDn", "dc=example,dc=com"
-            ,"attrName", "description"
-    )
+    private static final Map<String, String> ldapParams = [
+            "uri": "ldap://ldap.forumsys.com"
+            ,"bindDn": "cn=read-only-admin,dc=example,dc=com"
+            ,"password": "password"
+            ,"baseDn": "dc=example,dc=com"
+            ,"attrName": "description"
+            ]
+
 
     def "can build configuration from one-entry ldap tree"(){
         LdapTree ldapTree = Mock(LdapTree){

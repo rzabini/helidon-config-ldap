@@ -7,12 +7,13 @@ plugins {
     id "info.solidsoft.pitest" version "1.4.6"
 }
 
-//apply plugin: 'info.solidsoft.pitest'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'io.helidon.config:helidon-config:1.4.1'
-    implementation 'org.ldaptive:ldaptive:2.0.0-RC1'
+    implementation 'org.ldaptive:ldaptive:1.2.4'
     testCompile 'io.helidon.config:helidon-config-hocon:1.4.1'
     testImplementation 'org.codehaus.groovy:groovy-all:2.5.8'
 
