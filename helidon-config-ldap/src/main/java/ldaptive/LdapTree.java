@@ -1,7 +1,14 @@
 package ldaptive;
 
 import helidon.config.ldap.LdapEndpoint;
-import org.ldaptive.*;
+import org.ldaptive.BindConnectionInitializer;
+import org.ldaptive.ConnectionConfig;
+import org.ldaptive.ConnectionFactory;
+import org.ldaptive.Credential;
+import org.ldaptive.DefaultConnectionFactory;
+import org.ldaptive.LdapEntry;
+import org.ldaptive.SearchExecutor;
+import org.ldaptive.SearchResult;
 
 import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
@@ -16,6 +23,9 @@ public interface LdapTree {
 
     Map<String, String> toMap(String baseDn, String attrName) throws LdapException;
 
+    /**
+     *
+     */
     class Default implements LdapTree {
         private final String ldapUrl;
         private final String password;
@@ -33,8 +43,8 @@ public interface LdapTree {
 
         private String toDotted(final LdapEntry ldapEntry) {
             return ldapName(ldapEntry).getRdns().stream()
-                    .map(rdn -> rdn.getValue().toString())
-                    .collect(Collectors.joining("."));
+                .map(rdn -> rdn.getValue().toString())
+                .collect(Collectors.joining("."));
         }
 
         private static LdapName ldapName(final LdapEntry ldapEntry) {
@@ -45,12 +55,11 @@ public interface LdapTree {
             }
         }
 
+        @Override
         public Map<String, String> toMap(final String baseDn, final String attrName) throws LdapException {
-            ConnectionConfig connConfig = new ConnectionConfig(ldapUrl);
-               connConfig.setConnectionInitializer(
-                        new BindConnectionInitializer(
-                                bindDn, new Credential(password)));
-                ConnectionFactory cf = new DefaultConnectionFactory(connConfig);
+            final ConnectionConfig connConfig = new ConnectionConfig(ldapUrl);
+            connConfig.setConnectionInitializer(new BindConnectionInitializer(bindDn, new Credential(password)));
+            final ConnectionFactory cf = new DefaultConnectionFactory(connConfig);
             try {
                 return searchThenMap(baseDn, attrName, cf);
             } catch (org.ldaptive.LdapException e) {
@@ -58,18 +67,20 @@ public interface LdapTree {
             }
         }
 
-        private Map<String, String> searchThenMap(String baseDn, String attrName, ConnectionFactory cf) throws org.ldaptive.LdapException {
-            SearchExecutor executor = new SearchExecutor();
+        private Map<String, String> searchThenMap(String baseDn, String attrName, ConnectionFactory cf)
+                throws org.ldaptive.LdapException {
+            final SearchExecutor executor = new SearchExecutor();
             executor.setBaseDn(baseDn);
-            SearchResult result = executor.search(cf, String.format("(%s=*)", attrName), attrName).getResult();
+            final SearchResult result = executor.search(cf, String.format("(%s=*)", attrName), attrName).getResult();
             return mapResponse(result.getEntries(), attrName);
         }
 
-        public Map<String, String> mapResponse(final Collection<LdapEntry> searchResponseEntries, final String attrName) {
+        public Map<String, String> mapResponse(
+                final Collection<LdapEntry> searchResponseEntries, final String attrName) {
             return searchResponseEntries.stream()
                     .collect(Collectors.toMap(
-                            this::toDotted,
-                            ldapEntry -> value(ldapEntry, attrName)));
+                        this::toDotted,
+                        ldapEntry -> value(ldapEntry, attrName)));
         }
     }
 }

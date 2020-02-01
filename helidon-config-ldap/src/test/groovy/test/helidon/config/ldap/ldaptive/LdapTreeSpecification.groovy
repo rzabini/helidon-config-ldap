@@ -17,7 +17,7 @@ class LdapTreeSpecification extends Specification {
         Collection<LdapEntry> entries = new ArrayList<LdapEntry>()
         LdapEntry entry = new LdapEntry()
         entry.setDn('cn=item, dc=example, dc=com')
-        entry.addAttributes(new LdapAttribute('attrname', 'attrvalue'))
+        entry.addAttribute(new LdapAttribute('attrname', 'attrvalue'))
         entries.add(entry)
 
         expect:

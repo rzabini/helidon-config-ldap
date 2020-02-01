@@ -1,7 +1,10 @@
 package ldaptive;
 
+/**
+ *
+ */
 public class LdapException extends Exception {
-    public LdapException(org.ldaptive.LdapException e) {
+    public LdapException(final org.ldaptive.LdapException e) {
         super(e);
     }
 }
