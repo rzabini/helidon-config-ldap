@@ -36,7 +36,7 @@ public class LdapConfigSource extends AbstractConfigSource<Instant> {
 
     @Override
     protected Optional<Instant> dataStamp() {
-        return Optional.of(Instant.parse("2018-07-17T09:59:51.312Z"));
+        return Optional.of(Instant.now());
     }
 
     @Override
