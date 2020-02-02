@@ -1,7 +1,7 @@
 package helidon.config.ldap;
 
 /**
- *
+ * LdapEndoint represents an uri with authentication credentials.
  */
 @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 public class LdapEndpoint {

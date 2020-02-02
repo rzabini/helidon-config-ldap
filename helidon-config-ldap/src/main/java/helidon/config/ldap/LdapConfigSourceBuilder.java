@@ -7,7 +7,17 @@ import io.helidon.config.spi.ConfigSource;
 import java.util.function.Consumer;
 
 /**
- *
+ * LdapConfigSource builder.
+ * <p>
+ * Creates a {@link LdapConfigSource} while allowing the application to the following properties:
+ * <ul>
+ * <li>{@code uri} - an uri to the ldap server</li>
+ * <li>{@code bindDn} - distinguished name of user</li>
+ * <li>{@code password} - password of bindDn</li>
+ * <li>{@code baseDn} - root of configuration tree</li>
+ * <li>{@code attrName} - name of ldap attribute containing config value</li>
+ * </ul>
+ * <p>
  */
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.DefaultPackage"})
 public class LdapConfigSourceBuilder
